@@ -1,44 +1,26 @@
 name: Deploy Tailwind CSS
 on:
   push:
-    branches: [ master ]  # <-- UBAH INI
+    branches: [ master ]
   workflow_dispatch:
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
       uses: actions/checkout@v4
     
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
+    # DOCKER TAILWIND - NO NPM PROBLEMS
+    - name: Build Tailwind CSS
+      uses: docker://ghcr.io/tailwindlabs/tailwindcss:latest
       with:
-        node-version: '20'
+        args: "-i ./src/input.css -o ./dist/output.css --minify"
     
-    - name: Install Tailwind CSS
-      run: npm install -g tailwindcss@latest
-    
-    - name: Build CSS
+    - name: Setup dist folder
       run: |
         mkdir -p dist
-        tailwindcss -i ./src/input.css -o ./dist/output.css --minify
+        cp src/index.html dist/
     
-    - name: Copy HTML
-      run: cp ./src/index.html ./dist/
-    
-    - name: Upload artifact
-      uses: actions/upload-pages-artifact@v3
-      with:
-        path: ./dist
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
     - name: Deploy to GitHub Pages
-      id: deployment
       uses: actions/deploy-pages@v4
