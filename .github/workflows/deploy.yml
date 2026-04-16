@@ -1,19 +1,39 @@
-name: Deploy Tailwind
-on: [push, pull_request]
+name: Deploy Tailwind CSS
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
-      with: { node-version: 20, cache: npm }
-    - run: npm ci
-    - run: npm run build
-    - uses: actions/upload-pages-artifact@v3
-      with: { path: dist }
   deploy:
-    needs: build
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
     steps:
-    - uses: actions/deploy-pages@v4
+    - name: Checkout
+      uses: actions/checkout@v4
+    
+    # BUILD TAILWIND (NO NPM CACHE)
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+    
+    - name: Install Tailwind
+      run: npm install tailwindcss@latest
+    
+    - name: Build CSS
+      run: npx tailwindcss -i ./src/input.css -o ./dist/output.css --minify
+    
+    - name: Create index.html
+      run: mkdir -p dist && cp src/index.html dist/
+    
+    - name: Deploy
+      id: deployment
+      uses: actions/deploy-pages@v4
