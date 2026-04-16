@@ -1,22 +1,44 @@
-name: Tailwind Build & Deploy
+name: Deploy Tailwind CSS
 on:
   push:
-    branches: [ master ]
+    branches: [ master ]  # <-- UBAH INI
+  workflow_dispatch:
+
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout
+      uses: actions/checkout@v4
     
-    - name: Tailwind CSS Build
-      uses: twinlife/tailwindcss-action@v1
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
       with:
-        config: ./tailwind.config.js
-        input: ./src/input.css
-        output: ./dist/output.css
+        node-version: '20'
     
-    - name: Deploy
-      uses: peaceiris/actions-gh-pages@v3
+    - name: Install Tailwind CSS
+      run: npm install -g tailwindcss@latest
+    
+    - name: Build CSS
+      run: |
+        mkdir -p dist
+        tailwindcss -i ./src/input.css -o ./dist/output.css --minify
+    
+    - name: Copy HTML
+      run: cp ./src/index.html ./dist/
+    
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v3
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./dist
+        path: ./dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4
