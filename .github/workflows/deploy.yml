@@ -1,24 +1,40 @@
-name: Deploy Tailwind
+name: Deploy Tailwind CSS
 on:
   push:
     branches: [ master ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write  # <-- THIS FIXES IT
+
 jobs:
   deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout
+      uses: actions/checkout@v4
+    
+    - name: Setup Pages
+      uses: actions/configure-pages@v5
     
     - name: Build Tailwind
       run: |
+        mkdir -p dist
         curl -sLO https://github.com/tailwindlabs/tailwindcss/releases/latest/download/tailwindcss-linux-x64
         chmod +x tailwindcss-linux-x64
-        mkdir -p dist
         ./tailwindcss-linux-x64 -i ./src/input.css -o ./dist/output.css --minify
-        cp src/index.html dist/
+        cp ./src/index.html ./dist/
     
-    - uses: actions/upload-pages-artifact@v3
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v3
       with:
         path: ./dist
     
-    - id: deployment
+    - name: Deploy to GitHub Pages
+      id: deployment
       uses: actions/deploy-pages@v4
