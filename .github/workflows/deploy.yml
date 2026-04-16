@@ -1,7 +1,7 @@
 name: Deploy Tailwind CSS
 on:
   push:
-    branches: [ main ]
+    branches: [ master ]
   workflow_dispatch:
 
 permissions:
@@ -17,23 +17,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5  # Updated v5
     
-    # BUILD TAILWIND (NO NPM CACHE)
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
+    - name: Setup Node.js 24
+      uses: actions/setup-node@v5  # Updated v5
       with:
-        node-version: '20'
+        node-version: 24  # Node 24 ✅
     
-    - name: Install Tailwind
-      run: npm install tailwindcss@latest
+    - name: Install & Build Tailwind
+      run: |
+        npm install tailwindcss@latest
+        mkdir -p dist
+        npx tailwindcss -i ./src/input.css -o ./dist/output.css --minify
+        cp ./src/index.html ./dist/
     
-    - name: Build CSS
-      run: npx tailwindcss -i ./src/input.css -o ./dist/output.css --minify
-    
-    - name: Create index.html
-      run: mkdir -p dist && cp src/index.html dist/
-    
-    - name: Deploy
+    - name: Deploy to GitHub Pages
       id: deployment
-      uses: actions/deploy-pages@v4
+      uses: actions/deploy-pages@v5  # Updated v5
