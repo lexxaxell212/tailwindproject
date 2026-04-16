@@ -1,32 +1,30 @@
-name: Deploy Tailwind CSS
+name: Deploy Tailwind
 on:
   push:
-    branches: [ master ]
+    branches: [ "master" ]
   workflow_dispatch:
 
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout
-      uses: actions/checkout@v5
-    
-    - name: Setup Node.js
-      uses: actions/setup-node@v5
-      with:
-        node-version: 24
-    
-    # DIRECT TAILWIND CLI - NO NPM INSTALL
-    - name: Build Tailwind CSS
-      run: |
-        npx tailwindcss@latest --input ./src/input.css --output ./dist/output.css --minify
-        mkdir -p dist
-        cp ./src/index.html ./dist/
-    
-    - name: Deploy
-      uses: actions/deploy-pages@v5
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Build with Tailwind CLI
+        uses: actions-rs/tailwindcss-action@v1
+        with:
+          input: src/input.css
+          output: dist/output.css
+      
+      - name: Copy HTML
+        run: |
+          mkdir -p dist
+          cp src/index.html dist/
+          cp src/input.css dist/
+      
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
