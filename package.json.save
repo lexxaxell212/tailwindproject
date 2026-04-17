@@ -1,0 +1,14 @@
+{
+  "name": "tailwind-landing",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "npx tailwindcss -i ./input.css -o ./output.css --minify",
+    "dev": "npx tailwindcss -i ./input.css -o ./output.css --watch",
+    "preview": "npx serve ."
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.5.0",
+    "postcss": "^8.5.10",
+    "tailwindcss": "^4.2.2"
+  }
+}
