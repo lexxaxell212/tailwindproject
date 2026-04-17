@@ -1,5 +1,11 @@
+/** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ["./*.html"],
+  content: [
+    "./node_modules/flowbite/**/*.js",
+    "./src/**/*.{html,js}",
+    "./templates/**/*.{html,twig}",
+    "./*.html"
+  ],
   darkMode: 'class',
   theme: {
     extend: {
@@ -11,5 +17,8 @@ module.exports = {
         }
       }
     }
-  }
+  },
+  plugins: [
+  require('flowbite/plugin')  // Flowbite v3 plugin
+  ],
 }
