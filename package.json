@@ -2,6 +2,7 @@
   "scripts": {
     "build": "tailwindcss -i ./input.css -o ./output.css --minify",
     "watch": "tailwindcss -i ./input.css -o ./output.css --watch",
+    "flowbite": "flowbite-react",
     "dev": "npm run serve ."
   },
   "devDependencies": {
