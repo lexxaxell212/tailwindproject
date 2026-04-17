@@ -3,6 +3,7 @@ module.exports = {
   // 🔍 SCAN SEMUA HTML FILES
   content: [
     "./*.html",
+    "./**/*.html",
   ],
   
   // 🌙 DARK MODE CLASS BASED
